@@ -1,0 +1,150 @@
+{
+	"info": {
+		"_postman_id": "e40a4a90-6211-49ae-9623-8e717fcf5996",
+		"name": "Portfolio",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "16798660",
+		"_collection_link": "https://dark-meteor-413830.postman.co/workspace/Finance~e6e6e188-bbfd-4305-acf9-e240871445a7/collection/16798660-e40a4a90-6211-49ae-9623-8e717fcf5996?action=share&source=collection_link&creator=16798660"
+	},
+	"item": [
+		{
+			"name": "Trade",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"stockId\": \"61e7803706ee740012345679\", \n    \"type\": \"BUY\", \n    \"price\": 120,\n    \"quantity\":30\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/portfolio/addTrade",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"portfolio",
+						"addTrade"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Trade",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"stockId\": \"61e7803706ee740012345678\", \n    \"type\": \"BUY\", \n    \"price\": 120 \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/portfolio/updateTrade/65e201e1913cb47569d05fdf",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"portfolio",
+						"updateTrade",
+						"65e201e1913cb47569d05fdf"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Trade",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/portfolio/removeTrade/65e201e1913cb47569d05fdf",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"portfolio",
+						"removeTrade",
+						"65e201e1913cb47569d05fdf"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/portfolio",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"portfolio"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Holdings",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/portfolio/holdings",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"portfolio",
+						"holdings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Returns",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/portfolio/returns",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"portfolio",
+						"returns"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
