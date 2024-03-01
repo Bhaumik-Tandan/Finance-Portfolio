@@ -1,31 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { TradesService } from 'src/trades/trades.service';
+
 @Injectable()
 export class PortfoliosService {
   constructor(private tradesService: TradesService) {}
-  addTrade(trade) {
-    return this.tradesService.create(trade);
+
+  private async processTrades(trades, callback) {
+    const result = {};
+
+    for (const stock of trades) {
+      const stockName = stock.stock[0].name;
+      const stockTrades = stock.trades;
+      const value = await this.getAverageBuyingPriceAndHoldingQuantity(stockTrades);
+      result[stockName] = callback(value);
+    }
+
+    return result;
   }
 
-  async calculateTotalValues(stockTrades) {
-    let totalQuantity = 0;
-    let totalValue = 0;
-
-    stockTrades.forEach((trade) => {
-      const { type, price, quantity } = trade;
-      if (type === 'BUY') {
-        totalQuantity += quantity;
-        totalValue += quantity * price;
-      } else if (type === 'SELL') {
-        totalQuantity -= quantity;
-        totalValue -= quantity * price;
-      }
-    });
-
-    return { totalQuantity, totalValue };
-  }
-
-  getAverageBuyingPriceAndHoldingQuantity(stockTrades) {
+  private getAverageBuyingPriceAndHoldingQuantity(stockTrades) {
     let totalHolding = 0;
     let totalBoughtPrice = 0;
     let totalBought = 0;
@@ -45,78 +38,15 @@ export class PortfoliosService {
   }
 
   async calculatePortfolio(trades) {
-    const portfolio = {};
-
-    for (const stock of trades) {
-      const stockName = stock.stock[0].name;
-      const stockTrades = stock.trades;
-
-      const holding=
-        await this.getAverageBuyingPriceAndHoldingQuantity(stockTrades);
-
-      portfolio[stockName] = {
-        trades: stockTrades,
-        holding
-      };
-    }
-
-    return portfolio;
+    return this.processTrades(trades, (value) => ({ trades: value.trades, holding: value }));
   }
 
   async calculateHoldings(trades) {
-    const holdings = {};
-
-    for (const stock of trades) {
-      const stockName = stock.stock[0].name;
-      const stockTrades = stock.trades;
-
-      const { totalQuantity, totalValue } =
-        await this.calculateTotalValues(stockTrades);
-
-      if (totalQuantity !== 0) {
-        const avgPrice = totalValue / totalQuantity;
-        holdings[stockName] = {
-          quantity: totalQuantity,
-          avgPrice: avgPrice.toFixed(2),
-        };
-      }
-    }
-
-    return holdings;
+    return this.processTrades(trades, (value) => value);
   }
 
   async calculateReturns(trades) {
-    const portfolio = {};
-
-    for (const stock of trades) {
-      const stockName = stock.stock[0].name;
-      const stockTrades = stock.trades;
-
-      let totalQuantity = 0;
-      let totalInvestment = 0;
-
-      stockTrades.forEach((trade) => {
-        if (trade.type === 'BUY') {
-          totalQuantity += trade.quantity;
-          totalInvestment += trade.price * trade.quantity;
-        }
-      });
-
-      if (totalQuantity > 0) {
-        const averageBuyingPrice = totalInvestment / totalQuantity;
-        const initialPrice = stockTrades[0].price;
-        const finalPrice = 100;
-        const cumulativeReturn =
-          ((finalPrice - initialPrice) * totalQuantity) / initialPrice;
-
-        portfolio[stockName] = {
-          averageBuyingPrice: averageBuyingPrice.toFixed(2),
-          cumulativeReturn: cumulativeReturn.toFixed(2),
-        };
-      }
-    }
-
-    return portfolio;
+    return this.processTrades(trades, (value) => (100 - value.averageBuyingPrice) * value.totalHolding);
   }
 
   async getPortfolio() {
