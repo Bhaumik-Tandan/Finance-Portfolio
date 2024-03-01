@@ -1,9 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { TradesService } from 'src/trades/trades.service';
 
+const CURRENT_PRICE=100;
 @Injectable()
 export class PortfoliosService {
   constructor(private tradesService: TradesService) {}
+
+  addTrade(trade) {
+    return this.tradesService.create(trade);
+  }
 
   private async processTrades(trades, callback) {
     const result = {};
@@ -12,7 +17,7 @@ export class PortfoliosService {
       const stockName = stock.stock[0].name;
       const stockTrades = stock.trades;
       const value = await this.getAverageBuyingPriceAndHoldingQuantity(stockTrades);
-      result[stockName] = callback(value);
+      result[stockName] = callback({holding:value,trades:stockTrades});
     }
 
     return result;
@@ -38,15 +43,15 @@ export class PortfoliosService {
   }
 
   async calculatePortfolio(trades) {
-    return this.processTrades(trades, (value) => ({ trades: value.trades, holding: value }));
-  }
-
-  async calculateHoldings(trades) {
     return this.processTrades(trades, (value) => value);
   }
 
+  async calculateHoldings(trades) {
+    return this.processTrades(trades, (value) => value.holding);
+  }
+
   async calculateReturns(trades) {
-    return this.processTrades(trades, (value) => (100 - value.averageBuyingPrice) * value.totalHolding);
+    return this.processTrades(trades, ({holding}) => (CURRENT_PRICE - holding.averageBuyingPrice) * holding.totalHolding);
   }
 
   async getPortfolio() {
