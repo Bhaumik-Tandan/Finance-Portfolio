@@ -1,36 +1,36 @@
 import { Schema, Document, model } from 'mongoose';
 
 export interface ITrade extends Document {
-  stockId: Schema.Types.ObjectId,
-  type:String,
-  price:Number,
-  quantity:Number
+  stockId: Schema.Types.ObjectId;
+  type: String;
+  price: Number;
+  quantity: Number;
 }
 
-export enum TRADE_TYPES{
-  BUY="BUY",
-  SELL="SELL"
+export enum TRADE_TYPES {
+  BUY = 'BUY',
+  SELL = 'SELL',
 }
 
 const TradesSchema = new Schema<ITrade>(
   {
-    stockId:{
+    stockId: {
       type: Schema.Types.ObjectId,
       required: true,
     },
     type: {
       type: String,
       required: true,
-      enum: TRADE_TYPES
+      enum: TRADE_TYPES,
     },
     price: {
       type: Number,
-      required: true
+      required: true,
     },
-    quantity:{
+    quantity: {
       type: Number,
-      required: true
-    }
+      required: true,
+    },
   },
   { timestamps: true },
 );

@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Put, Param,Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Put,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { PortfoliosService } from './portfolios.service';
 
 @Controller('portfolio')
@@ -6,11 +14,9 @@ export class PortfoliosController {
   constructor(private readonly portfoliosService: PortfoliosService) {}
 
   @Get()
-  getPortfolio()
-  {
+  getPortfolio() {
     return this.portfoliosService.getPortfolio();
   }
-
 
   @Post('addTrade')
   createTrade(@Body() tradeBody) {
@@ -23,8 +29,8 @@ export class PortfoliosController {
   }
 
   @Put('updateTrade/:id')
-  updateTrade(@Body() updatedTradeBody,@Param('id') tradeId) {
-    return this.portfoliosService.updateTrade(tradeId,updatedTradeBody);
+  updateTrade(@Body() updatedTradeBody, @Param('id') tradeId) {
+    return this.portfoliosService.updateTrade(tradeId, updatedTradeBody);
   }
   @Delete('removeTrade/:id')
   deleteTrade(@Param('id') tradeId) {
