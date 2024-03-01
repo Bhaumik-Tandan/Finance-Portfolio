@@ -21,29 +21,29 @@ export class TradesService {
 
   async getAllTradesGroupedByStockId() {
     try {
-      const trades = await this.tradeModel.aggregate([
-        {
-          $group: {
-            _id: '$stockId',
-            trades: { $push: '$$ROOT' } 
-          }
-        },
-        {
-          $lookup: {
-            from: 'stocks', 
-            localField: '_id',
-            foreignField: '_id',
-            as: 'stock'
-          }
-        }
-      ]).exec();
+      const trades = await this.tradeModel
+        .aggregate([
+          {
+            $group: {
+              _id: '$stockId',
+              trades: { $push: '$$ROOT' },
+            },
+          },
+          {
+            $lookup: {
+              from: 'stocks',
+              localField: '_id',
+              foreignField: '_id',
+              as: 'stock',
+            },
+          },
+        ])
+        .exec();
       return trades;
     } catch (error) {
       throw new Error(`Error while fetching trades: ${error}`);
     }
   }
-  
-  
 
   findOne(id: number) {
     return this.tradeModel.findById(id).exec();

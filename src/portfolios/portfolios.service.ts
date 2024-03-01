@@ -7,129 +7,132 @@ export class PortfoliosService {
     return this.tradesService.create(trade);
   }
 
-  async  getPortfolio() {
-    const trades = await this.tradesService.getAllTradesGroupedByStockId();
-    
+  async calculateTotalValues(stockTrades) {
+    let totalQuantity = 0;
+    let totalValue = 0;
+
+    stockTrades.forEach((trade) => {
+      const { type, price, quantity } = trade;
+      if (type === 'BUY') {
+        totalQuantity += quantity;
+        totalValue += quantity * price;
+      } else if (type === 'SELL') {
+        totalQuantity -= quantity;
+        totalValue -= quantity * price;
+      }
+    });
+
+    return { totalQuantity, totalValue };
+  }
+
+  getAverageBuyingPriceAndHoldingQuantity(stockTrades) {
+    let totalHolding = 0;
+    let totalBoughtPrice = 0;
+    let totalBought = 0;
+
+    stockTrades.forEach((trade) => {
+      const { type, price, quantity } = trade;
+      if (type === 'BUY') {
+        totalBought += quantity;
+        totalHolding += quantity;
+        totalBoughtPrice += quantity * price;
+      } else if (type === 'SELL') totalHolding -= quantity;
+    });
+
+    const averageBuyingPrice = totalBoughtPrice / totalBought;
+
+    return { averageBuyingPrice, totalHolding };
+  }
+
+  async calculatePortfolio(trades) {
     const portfolio = {};
-  
-    trades.forEach(stock => {
+
+    for (const stock of trades) {
       const stockName = stock.stock[0].name;
       const stockTrades = stock.trades;
-      const tradesFormatted = stockTrades.map(trade => ({
-        type: trade.type,
-        quantity: trade.quantity,
-        price: trade.price,
-        date: new Date(trade.createdAt).toLocaleDateString()
-      }));
-      
-      let totalQuantity = 0;
-      let totalValue = 0;
-      let totalInvestment = 0;
-  
-      stockTrades.forEach(trade => {
-        const { type, price, quantity } = trade;
-        if (type === 'BUY') {
-          totalQuantity += quantity;
-          totalValue += quantity * price;
-          totalInvestment += quantity * price;
-        } else if (type === 'SELL') {
-          totalQuantity -= quantity;
-          totalValue -= quantity * price;
-        }
-      });
-  
-      const avgPrice = totalInvestment / totalQuantity;
+
+      const holding=
+        await this.getAverageBuyingPriceAndHoldingQuantity(stockTrades);
+
       portfolio[stockName] = {
-        trades: tradesFormatted,
-        netHoldings: {
-          quantity: totalQuantity,
-          avgPrice: avgPrice.toFixed(2)
-        },
-        averagePrice: avgPrice.toFixed(2)
+        trades: stockTrades,
+        holding
       };
-    });
-  
+    }
+
     return portfolio;
   }
 
-  
-
-  async getHoldings() {
-    const trades = await this.tradesService.getAllTradesGroupedByStockId();
-    
+  async calculateHoldings(trades) {
     const holdings = {};
-  
-    trades.forEach(stock => {
+
+    for (const stock of trades) {
       const stockName = stock.stock[0].name;
       const stockTrades = stock.trades;
-  
-      let totalQuantity = 0;
-      let totalValue = 0;
-      let totalInvestment = 0;
-  
-      stockTrades.forEach(trade => {
-        const { type, price, quantity } = trade;
-        if (type === 'BUY') {
-          totalQuantity += quantity;
-          totalValue += quantity * price;
-          totalInvestment += quantity * price;
-        } else if (type === 'SELL') {
-          totalQuantity -= quantity;
-          totalValue -= quantity * price;
-        }
-      });
-  
+
+      const { totalQuantity, totalValue } =
+        await this.calculateTotalValues(stockTrades);
+
       if (totalQuantity !== 0) {
-        const avgPrice = totalInvestment / totalQuantity;
+        const avgPrice = totalValue / totalQuantity;
         holdings[stockName] = {
           quantity: totalQuantity,
-          avgPrice: avgPrice.toFixed(2)
+          avgPrice: avgPrice.toFixed(2),
         };
       }
-    });
-  
+    }
+
     return holdings;
   }
-  
-  async  getReturns() {
-    const trades = await this.tradesService.getAllTradesGroupedByStockId();
-    
+
+  async calculateReturns(trades) {
     const portfolio = {};
-  
-    trades.forEach(stock => {
+
+    for (const stock of trades) {
       const stockName = stock.stock[0].name;
       const stockTrades = stock.trades;
-  
+
       let totalQuantity = 0;
       let totalInvestment = 0;
-  
-      stockTrades.forEach(trade => {
+
+      stockTrades.forEach((trade) => {
         if (trade.type === 'BUY') {
           totalQuantity += trade.quantity;
           totalInvestment += trade.price * trade.quantity;
         }
       });
-  
+
       if (totalQuantity > 0) {
         const averageBuyingPrice = totalInvestment / totalQuantity;
-        const initialPrice = stockTrades[0].price; // Assuming the initial price is the first price in the trades array
-        const finalPrice = 100; // Assuming the final price to be 100 for simplicity
-        
-        const cumulativeReturn = ((finalPrice - initialPrice) * totalQuantity) / initialPrice;
-  
+        const initialPrice = stockTrades[0].price;
+        const finalPrice = 100;
+        const cumulativeReturn =
+          ((finalPrice - initialPrice) * totalQuantity) / initialPrice;
+
         portfolio[stockName] = {
           averageBuyingPrice: averageBuyingPrice.toFixed(2),
-          cumulativeReturn: cumulativeReturn.toFixed(2)
+          cumulativeReturn: cumulativeReturn.toFixed(2),
         };
       }
-    });
-  
+    }
+
     return portfolio;
   }
-  
-  
-  
-  
+
+  async getPortfolio() {
+    const trades = await this.tradesService.getAllTradesGroupedByStockId();
+    return this.calculatePortfolio(trades);
+  }
+
+  async getHoldings() {
+    const trades = await this.tradesService.getAllTradesGroupedByStockId();
+    return this.calculateHoldings(trades);
+  }
+
+  async getReturns() {
+    const trades = await this.tradesService.getAllTradesGroupedByStockId();
+    return this.calculateReturns(trades);
+  }
 
   async updateTrade(tradeId, updatedTrade) {
     return this.tradesService.update(tradeId, updatedTrade);
