@@ -23,8 +23,13 @@ export class PortfoliosController {
     return this.portfoliosService.addTrade(tradeBody);
   }
 
+  @Get("returns")
+  getReturns() {
+    return this.portfoliosService.getReturns();
+  }
+
   @Get('holdings')
-  getTrade() {
+  getHoldings() {
     return this.portfoliosService.getHoldings();
   }
 

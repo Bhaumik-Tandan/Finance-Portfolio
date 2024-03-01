@@ -52,6 +52,8 @@ export class PortfoliosService {
     return portfolio;
   }
 
+  
+
   async getHoldings() {
     const trades = await this.tradesService.getAllTradesGroupedByStockId();
     
@@ -87,6 +89,42 @@ export class PortfoliosService {
     });
   
     return holdings;
+  }
+  
+  async  getReturns() {
+    const trades = await this.tradesService.getAllTradesGroupedByStockId();
+    
+    const portfolio = {};
+  
+    trades.forEach(stock => {
+      const stockName = stock.stock[0].name;
+      const stockTrades = stock.trades;
+  
+      let totalQuantity = 0;
+      let totalInvestment = 0;
+  
+      stockTrades.forEach(trade => {
+        if (trade.type === 'BUY') {
+          totalQuantity += trade.quantity;
+          totalInvestment += trade.price * trade.quantity;
+        }
+      });
+  
+      if (totalQuantity > 0) {
+        const averageBuyingPrice = totalInvestment / totalQuantity;
+        const initialPrice = stockTrades[0].price; // Assuming the initial price is the first price in the trades array
+        const finalPrice = 100; // Assuming the final price to be 100 for simplicity
+        
+        const cumulativeReturn = ((finalPrice - initialPrice) * totalQuantity) / initialPrice;
+  
+        portfolio[stockName] = {
+          averageBuyingPrice: averageBuyingPrice.toFixed(2),
+          cumulativeReturn: cumulativeReturn.toFixed(2)
+        };
+      }
+    });
+  
+    return portfolio;
   }
   
   
