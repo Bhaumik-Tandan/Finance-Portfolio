@@ -3,7 +3,8 @@ import { Schema, Document, model } from 'mongoose';
 export interface ITrade extends Document {
   stockId: Schema.Types.ObjectId,
   type:String,
-  price:Number
+  price:Number,
+  quantity:Number
 }
 
 export enum TRADE_TYPES{
@@ -25,8 +26,11 @@ const TradesSchema = new Schema<ITrade>(
     price: {
       type: Number,
       required: true
+    },
+    quantity:{
+      type: Number,
+      required: true
     }
-
   },
   { timestamps: true },
 );

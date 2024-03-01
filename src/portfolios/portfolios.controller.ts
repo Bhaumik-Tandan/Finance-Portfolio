@@ -5,9 +5,21 @@ import { PortfoliosService } from './portfolios.service';
 export class PortfoliosController {
   constructor(private readonly portfoliosService: PortfoliosService) {}
 
+  @Get()
+  getPortfolio()
+  {
+    return this.portfoliosService.getPortfolio();
+  }
+
+
   @Post('addTrade')
   createTrade(@Body() tradeBody) {
     return this.portfoliosService.addTrade(tradeBody);
+  }
+
+  @Get('holdings/:id')
+  getTrade(@Param('id') tradeId) {
+    // return this.portfoliosService.addTrade(tradeBody);
   }
 
   @Put('updateTrade/:id')

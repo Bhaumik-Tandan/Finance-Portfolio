@@ -19,6 +19,11 @@ export class TradesService {
     return this.tradeModel.find().exec();
   }
 
+  getAllTradesGroupedByStockId()
+  {
+    return this.tradeModel.find().exec();
+  }
+
   findOne(id: number) {
     return this.tradeModel.findById(id).exec();
   }
