@@ -54,16 +54,19 @@ export class PortfoliosService {
     return this.processTrades(trades, ({holding}) => (CURRENT_PRICE - holding.averageBuyingPrice) * holding.totalHolding);
   }
 
+  // added as the same info added in the first page of the doc
   async getPortfolio() {
     const trades = await this.tradesService.getAllTradesGroupedByStockId();
     return this.calculatePortfolio(trades);
   }
 
+  // ignores teh sales for average selling price
   async getHoldings() {
     const trades = await this.tradesService.getAllTradesGroupedByStockId();
     return this.calculateHoldings(trades);
   }
 
+  // ignores profit from sales
   async getReturns() {
     const trades = await this.tradesService.getAllTradesGroupedByStockId();
     return this.calculateReturns(trades);
