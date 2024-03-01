@@ -23,9 +23,9 @@ export class PortfoliosController {
     return this.portfoliosService.addTrade(tradeBody);
   }
 
-  @Get('holdings/:id')
-  getTrade(@Param('id') tradeId) {
-    // return this.portfoliosService.addTrade(tradeBody);
+  @Get('holdings')
+  getTrade() {
+    return this.portfoliosService.getHoldings();
   }
 
   @Put('updateTrade/:id')

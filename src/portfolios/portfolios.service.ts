@@ -51,6 +51,44 @@ export class PortfoliosService {
   
     return portfolio;
   }
+
+  async getHoldings() {
+    const trades = await this.tradesService.getAllTradesGroupedByStockId();
+    
+    const holdings = {};
+  
+    trades.forEach(stock => {
+      const stockName = stock.stock[0].name;
+      const stockTrades = stock.trades;
+  
+      let totalQuantity = 0;
+      let totalValue = 0;
+      let totalInvestment = 0;
+  
+      stockTrades.forEach(trade => {
+        const { type, price, quantity } = trade;
+        if (type === 'BUY') {
+          totalQuantity += quantity;
+          totalValue += quantity * price;
+          totalInvestment += quantity * price;
+        } else if (type === 'SELL') {
+          totalQuantity -= quantity;
+          totalValue -= quantity * price;
+        }
+      });
+  
+      if (totalQuantity !== 0) {
+        const avgPrice = totalInvestment / totalQuantity;
+        holdings[stockName] = {
+          quantity: totalQuantity,
+          avgPrice: avgPrice.toFixed(2)
+        };
+      }
+    });
+  
+    return holdings;
+  }
+  
   
   
   
